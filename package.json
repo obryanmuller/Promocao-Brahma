@@ -1,0 +1,14 @@
+{
+  "name": "sab-brahma-cinco-vitorias",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch server.mjs",
+    "start": "node server.mjs",
+    "check": "node --check server.mjs && node --check public/app.js && node --check server/services/espn.js && node --check server/services/ranking.js && node --check api/ranking.js && node --check api/data-status.js"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
