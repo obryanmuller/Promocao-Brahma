@@ -3,6 +3,10 @@
   "framework": null,
   "outputDirectory": "public",
   "regions": ["gru1"],
+  "rewrites": [
+    { "source": "/share/:slug.svg", "destination": "/api/share?slug=:slug" },
+    { "source": "/:slug([a-z0-9-]+)", "destination": "/api/team?slug=:slug" }
+  ],
   "functions": {
     "api/*.js": {
       "maxDuration": 30
