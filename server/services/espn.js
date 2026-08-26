@@ -66,6 +66,22 @@ function parseEvent(event, league, teams) {
   };
 }
 
+function parseFixture(event, league, teams) {
+  const competition = event.competitions?.[0];
+  if (!competition || competition.status?.type?.completed) return null;
+  const home = competition.competitors?.find(item => item.homeAway === 'home');
+  const away = competition.competitors?.find(item => item.homeAway === 'away');
+  if (!home || !away) return null;
+  const homeCampaign = campaignName(home.team, teams);
+  const awayCampaign = campaignName(away.team, teams);
+  if (!homeCampaign && !awayCampaign) return null;
+  return {
+    id: event.id, date: event.date, competition: league.name,
+    home: { campaign: homeCampaign, name: home.team.displayName, logo: home.team.logo },
+    away: { campaign: awayCampaign, name: away.team.displayName, logo: away.team.logo }
+  };
+}
+
 function formatDate(value) {
   return new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: 'short', timeZone: 'America/Sao_Paulo' }).format(new Date(value)).replace('.', '').toUpperCase();
 }
@@ -75,12 +91,16 @@ export async function fetchEspnRanking({ teams, leagues = DEFAULT_LEAGUES, lookb
   const fromDate = new Date(now);
   fromDate.setUTCDate(fromDate.getUTCDate() - Math.max(30, Number(lookbackDays)));
   const from = toEspnDate(fromDate);
-  const to = toEspnDate(now);
+  const toDate = new Date(now);
+  toDate.setUTCDate(toDate.getUTCDate() + 90);
+  const to = toEspnDate(toDate);
   const settled = await Promise.allSettled(leagues.map(slug => requestLeague(slug, from, to)));
   const successful = settled.filter(result => result.status === 'fulfilled').map(result => result.value);
   const failedFeeds = settled.flatMap((result, index) => result.status === 'rejected' ? [{ slug: leagues[index], error: result.reason.message }] : []);
   const unique = new Map();
   successful.flatMap(league => league.events.map(event => parseEvent(event, league, teams))).filter(Boolean).forEach(match => unique.set(match.id, match));
+  const events = successful.flatMap(league => league.events.map(event => ({ event, league })))
+    .map(({ event, league }) => parseFixture(event, league, teams)).filter(Boolean);
   const matches = [...unique.values()].sort((a, b) => new Date(b.date) - new Date(a.date));
 
   const ranked = teams.map(team => {
@@ -101,7 +121,18 @@ export async function fetchEspnRanking({ teams, leagues = DEFAULT_LEAGUES, lookb
     const last = history[0];
     const own = last.home.campaign === team.name ? last.home : last.away;
     const rival = last.home.campaign === team.name ? last.away : last.home;
-    return { ...team, logo: ESPN_TEAM_LOGOS[team.name] || own.logo, streak: Math.min(streak, 5), lastResult, nextOpponent: rival.name, nextDate: formatDate(last.date), lastCompetition: last.competition, source: 'espn-public' };
+    const remaining = Math.max(0, 5 - Math.min(streak, 5));
+    const nextGames = events
+      .filter(match => match.home.campaign === team.name || match.away.campaign === team.name)
+      .sort((a, b) => new Date(a.date) - new Date(b.date))
+      .slice(0, remaining)
+      .map(match => {
+        const isHome = match.home.campaign === team.name;
+        const opponent = isHome ? match.away : match.home;
+        const opponentTeam = teams.find(item => item.name === opponent.campaign);
+        return { opponent: opponent.name, short: opponentTeam?.short || opponent.name.slice(0, 3).toUpperCase(), color: opponentTeam?.color || '#777', logo: opponent.logo, date: formatDate(match.date), isHome };
+      });
+    return { ...team, logo: ESPN_TEAM_LOGOS[team.name] || own.logo, streak: Math.min(streak, 5), lastResult, nextOpponent: rival.name, nextDate: formatDate(last.date), nextGames, lastCompetition: last.competition, source: 'espn-public' };
   }).sort((a, b) => {
     if (a.streak === null) return 1;
     if (b.streak === null) return -1;

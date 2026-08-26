@@ -503,6 +503,10 @@ h1 em, h2 em {
   gap: 14px;
 }
 
+.team-link {
+  color: inherit;
+}
+
 .team-name i {
   display: grid;
   place-items: center;
@@ -638,6 +642,135 @@ h1 em, h2 em {
   font-size: 10px;
   color: #777068;
   margin: 12px 0 0;
+}
+
+.team-spotlight {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 32px;
+  margin: -18px 0 52px;
+  padding: 30px 34px;
+  background: #fff;
+  border: 1px solid #bdb6ac;
+}
+
+.team-spotlight[hidden] {
+  display: none;
+}
+
+.team-spotlight h2 {
+  margin: 8px 0 14px;
+  font-size: clamp(38px, 5vw, 68px);
+  color: var(--red);
+}
+
+.spotlight-streak {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 12px;
+}
+
+.spotlight-streak svg {
+  width: 25px;
+  height: 25px;
+  color: var(--red);
+}
+
+.spotlight-progress {
+  display: flex;
+  gap: 7px;
+  margin: 0 0 15px;
+}
+
+.spotlight-progress span {
+  width: 30px;
+  height: 10px;
+  background: #d8d1c6;
+}
+
+.spotlight-progress span.active {
+  background: var(--red);
+}
+
+.team-spotlight p {
+  margin: 6px 0;
+}
+
+.team-spotlight small {
+  color: #686159;
+}
+
+.team-spotlight .button {
+  flex-shrink: 0;
+  margin-top: 0;
+}
+
+.fixture-list {
+  margin-top: 22px;
+  border-top: 1px solid var(--line);
+  padding-top: 16px;
+}
+
+.fixture-list > strong {
+  display: block;
+  margin-bottom: 10px;
+  color: #686159;
+  font-size: 9px;
+  letter-spacing: .14em;
+}
+
+.fixture {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 42px;
+}
+
+.fixture-crest {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  overflow: hidden;
+  background: var(--team);
+  color: #fff;
+  font-size: 8px;
+  font-weight: 900;
+}
+
+.fixture-crest img {
+  width: 25px;
+  height: 25px;
+  object-fit: contain;
+}
+
+.fixture > span:not(.fixture-crest) {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+}
+
+.fixture b {
+  font-size: 11px;
+}
+
+.fixture small {
+  color: #777;
+  font-size: 9px;
+  margin-top: 2px;
+}
+
+.fixture > svg {
+  width: 16px;
+  height: 16px;
+  color: var(--red);
+}
+
+.fixture-empty {
+  display: block;
+  margin-top: 20px;
 }
 
 .steps {
@@ -1115,6 +1248,15 @@ footer>strong {
   }
   .section-aside, .section-heading.compact>p {
     width: auto;
+  }
+  .team-spotlight {
+    align-items: flex-start;
+    flex-direction: column;
+    margin: -12px 0 36px;
+    padding: 24px;
+  }
+  .team-spotlight .button {
+    width: 100%;
   }
   .leaderboard-toolbar {
     align-items: flex-start;
