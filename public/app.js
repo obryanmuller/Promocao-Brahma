@@ -30,7 +30,10 @@ function render() {
     </article>`).join('') : '<div class="empty-state">Nenhum clube encontrado. Tente outro nome.</div>';
   window.lucide?.createIcons();
   showAll.hidden = Boolean(term);
-  showAll.innerHTML = expanded ? 'MOSTRAR MENOS <span aria-hidden="true">↑</span>' : 'VER TODOS OS 29 CLUBES <span aria-hidden="true">↓</span>';
+  showAll.innerHTML = expanded
+    ? 'MOSTRAR MENOS <span class="icon-inline" data-lucide="arrow-up" aria-hidden="true"></span>'
+    : 'VER TODOS OS 29 CLUBES <span class="icon-inline" data-lucide="arrow-down" aria-hidden="true"></span>';
+  window.lucide?.createIcons();
 }
 
 async function loadRanking() {
@@ -69,4 +72,5 @@ menu.addEventListener('click', () => {
 });
 document.querySelectorAll('nav a').forEach(link => link.addEventListener('click', () => document.body.classList.remove('menu-open')));
 
+window.lucide?.createIcons();
 loadRanking();
