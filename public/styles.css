@@ -665,6 +665,18 @@ h1 em, h2 em {
   color: var(--red);
 }
 
+.spotlight-heading {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.spotlight-logo {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+}
+
 .spotlight-streak {
   display: flex;
   align-items: center;

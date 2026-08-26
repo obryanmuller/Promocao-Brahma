@@ -14,7 +14,9 @@ export default async function handler(request, response) {
     const team = teams.find(item => slugify(item.name) === slug);
     if (!team) return response.status(404).send('Clube não encontrado');
     response.setHeader('Cache-Control', 'public, s-maxage=900, stale-while-revalidate=3600');
-    return response.status(200).setHeader('Content-Type', 'text/html; charset=utf-8').send(await renderTeamPage(team, `/${slug}`));
+    const protocol = request.headers['x-forwarded-proto'] || 'https';
+    const origin = `${protocol}://${request.headers.host}`;
+    return response.status(200).setHeader('Content-Type', 'text/html; charset=utf-8').send(await renderTeamPage(team, `/${slug}`, origin));
   } catch (error) {
     return response.status(500).json({ error: error.message });
   }

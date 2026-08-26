@@ -42,7 +42,9 @@ async function shareSvg(team) {
   const gameLogos = await Promise.all((team.nextGames || []).map(game => imageDataUri(game.logo)));
   const games = (team.nextGames || []).map((game, index) => `<g transform="translate(${78 + index * 170} 438)"><rect width="132" height="70" rx="8" fill="#8e0718"/><rect x="12" y="14" width="38" height="38" rx="6" fill="${escapeXml(game.color || '#777')}"/>${gameLogos[index] ? `<image href="${gameLogos[index]}" x="15" y="17" width="32" height="32" preserveAspectRatio="xMidYMid meet"/>` : `<text x="31" y="39" text-anchor="middle" fill="#fff" font-family="Arial,sans-serif" font-size="10" font-weight="700">${escapeXml(game.short)}</text>`}<text x="62" y="31" fill="#fff" font-family="Arial,sans-serif" font-size="11" font-weight="700">${game.isHome ? '⌂' : '✈'} ${escapeXml(game.date)}</text><text x="62" y="48" fill="#ffffffaa" font-family="Arial,sans-serif" font-size="9">${escapeXml(game.opponent).slice(0, 13)}</text></g>`).join('');
   const teamLogoData = await imageDataUri(team.logo);
-  const teamLogo = `<rect x="900" y="120" width="120" height="120" rx="20" fill="${escapeXml(team.color || '#777')}"/><text x="960" y="195" text-anchor="middle" fill="#fff" font-family="Arial,sans-serif" font-size="32" font-weight="900">${escapeXml(team.short)}</text>${teamLogoData ? `<image href="${teamLogoData}" x="850" y="105" width="220" height="150" preserveAspectRatio="xMidYMid meet"/>` : ''}`;
+  const teamLogo = teamLogoData
+    ? `<image href="${teamLogoData}" x="850" y="105" width="220" height="150" preserveAspectRatio="xMidYMid meet"/>`
+    : `<text x="960" y="195" text-anchor="middle" fill="#fff" font-family="Arial,sans-serif" font-size="32" font-weight="900">${escapeXml(team.short)}</text>`;
   return `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630"><rect width="1200" height="630" fill="#c90920"/><circle cx="1040" cy="-40" r="360" fill="#8e0718"/><text x="78" y="92" fill="#ffd31a" font-family="Arial,sans-serif" font-size="24" font-weight="700" letter-spacing="5">CORRIDA DAS 5 VITÓRIAS</text><text x="78" y="190" fill="#fff" font-family="Arial,sans-serif" font-size="72" font-weight="900">${escapeXml(team.name).toUpperCase()}</text>${teamLogo}<text x="78" y="236" fill="#f4efe6" font-family="Arial,sans-serif" font-size="28">${streak} vitórias consecutivas</text>${cups}<text x="78" y="420" fill="#fff" font-family="Arial,sans-serif" font-size="34" font-weight="700">${missing ? `Faltam ${missing} para a Brahma grátis` : 'A Brahma é nossa!'}</text>${games}<text x="78" y="600" fill="#ffffffaa" font-family="Arial,sans-serif" font-size="17">Partidas oficiais e amistosas · Empate ou derrota interrompe a sequência</text></svg>`;
 }
 
@@ -54,7 +56,7 @@ async function renderPage(team, pathname) {
     ? `${team.name}: ${team.streak ?? 0} vitórias consecutivas. Faltam ${Math.max(0, 5 - (team.streak ?? 0))} para a Brahma grátis.`
     : 'Acompanhe a corrida dos clubes da Sociedade Anônima da Brahma pelas cinco vitórias seguidas.';
   const slug = team ? slugify(team.name) : '';
-  const image = team ? `/share/${slug}.svg` : '/assets/torcida-hero.png';
+  const image = team ? `${process.env.PUBLIC_ORIGIN || `http://${host}:${port}`}/share/${slug}.svg` : `${process.env.PUBLIC_ORIGIN || `http://${host}:${port}`}/assets/torcida-hero.png`;
   return html
     .replace('data-team-slug=""', `data-team-slug="${slug}"`)
     .replaceAll('5 Vitórias — S.A.B. Brahma', title)
