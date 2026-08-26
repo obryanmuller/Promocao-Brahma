@@ -32,6 +32,13 @@ a {
   text-decoration: none;
 }
 
+a:focus-visible,
+button:focus-visible,
+input:focus-visible {
+  outline: 3px solid var(--yellow);
+  outline-offset: 4px;
+}
+
 .age-strip {
   height: 27px;
   background: #0d0d0d;
@@ -529,6 +536,28 @@ h1 em, h2 em {
   width: 24px;
   height: 24px;
   stroke-width: 2;
+}
+
+.streak span i[data-lucide="beer"] {
+  display: block;
+  position: relative;
+  width: 20px;
+  height: 19px;
+  border: 2px solid currentColor;
+  border-top: 0;
+  border-radius: 0 0 5px 5px;
+}
+
+.streak span i[data-lucide="beer"]::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  right: -7px;
+  width: 5px;
+  height: 8px;
+  border: 2px solid currentColor;
+  border-left: 0;
+  border-radius: 0 4px 4px 0;
 }
 
 .streak span.hit {

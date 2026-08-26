@@ -3,6 +3,7 @@ const showAll = document.querySelector('#show-all');
 const search = document.querySelector('#team-search');
 const modeLabel = document.querySelector('#data-mode');
 const dataNote = document.querySelector('#data-note');
+const beerIcon = '<i data-lucide="beer" aria-hidden="true"></i>';
 let allTeams = [];
 let expanded = false;
 
@@ -10,9 +11,9 @@ const escapeHtml = value => String(value).replace(/[&<>'"]/g, char => ({ '&': '&
 
 function streakMarkup(streak) {
   if (streak === null || streak === undefined) {
-    return '<div class="streak streak-unavailable" aria-label="Dados indisponíveis"><span><i data-lucide="beer" aria-hidden="true"></i></span><span><i data-lucide="beer" aria-hidden="true"></i></span><span><i data-lucide="beer" aria-hidden="true"></i></span><span><i data-lucide="beer" aria-hidden="true"></i></span><span><i data-lucide="beer" aria-hidden="true"></i></span></div><b class="streak-count">—/5</b>';
+    return `<div class="streak streak-unavailable" aria-label="Dados indisponíveis">${Array.from({ length: 5 }, () => `<span>${beerIcon}</span>`).join('')}</div><b class="streak-count">—/5</b>`;
   }
-  return `<div class="streak" aria-label="${streak} de 5 vitórias">${Array.from({ length: 5 }, (_, index) => `<span class="${index < streak ? 'hit' : ''}"><i data-lucide="beer" aria-hidden="true"></i></span>`).join('')}</div><b class="streak-count">${streak}/5</b>`;
+  return `<div class="streak" aria-label="${streak} de 5 vitórias">${Array.from({ length: 5 }, (_, index) => `<span class="${index < streak ? 'hit' : ''}">${beerIcon}</span>`).join('')}</div><b class="streak-count">${streak}/5</b>`;
 }
 
 function render() {
@@ -29,7 +30,7 @@ function render() {
     </article>`).join('') : '<div class="empty-state">Nenhum clube encontrado. Tente outro nome.</div>';
   window.lucide?.createIcons();
   showAll.hidden = Boolean(term);
-  showAll.innerHTML = expanded ? 'MOSTRAR MENOS <span>↑</span>' : 'VER TODOS OS 29 CLUBES <span>↓</span>';
+  showAll.innerHTML = expanded ? 'MOSTRAR MENOS <span aria-hidden="true">↑</span>' : 'VER TODOS OS 29 CLUBES <span aria-hidden="true">↓</span>';
 }
 
 async function loadRanking() {
@@ -64,6 +65,7 @@ const menu = document.querySelector('.menu-button');
 menu.addEventListener('click', () => {
   const open = document.body.classList.toggle('menu-open');
   menu.setAttribute('aria-expanded', String(open));
+  menu.setAttribute('aria-label', open ? 'Fechar menu' : 'Abrir menu');
 });
 document.querySelectorAll('nav a').forEach(link => link.addEventListener('click', () => document.body.classList.remove('menu-open')));
 

@@ -5,7 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#c90920" />
     <meta name="description" content="Acompanhe a corrida dos clubes da Sociedade Anônima da Brahma pelas cinco vitórias seguidas." />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="5 Vitórias — S.A.B. Brahma" />
+    <meta property="og:description" content="Acompanhe a corrida dos clubes pelas cinco vitórias seguidas." />
+    <meta property="og:image" content="/assets/torcida-hero.png" />
+    <meta name="twitter:card" content="summary_large_image" />
     <title>5 Vitórias — S.A.B. Brahma</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="preload" as="image" href="/assets/torcida-hero.png" fetchpriority="high" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -54,12 +61,12 @@
         </div>
         <div class="leaderboard-shell">
           <div class="leaderboard-toolbar">
-            <label class="search"><span>⌕</span><input id="team-search" type="search" placeholder="Busque seu time" autocomplete="off" /></label>
+            <label class="search"><span aria-hidden="true">⌕</span><input id="team-search" type="search" aria-label="Buscar clube" placeholder="Busque seu time" autocomplete="off" /></label>
             <div class="legend"><span><i class="dot win"></i> Vitória</span><span><i class="dot empty"></i> Falta vencer</span></div>
           </div>
           <div class="leaderboard-header"><span>POS.</span><span>CLUBE</span><span>SEQUÊNCIA ATUAL</span><span>RESULTADO</span><span>ÚLTIMO ADVERSÁRIO</span></div>
           <div id="leaderboard" class="leaderboard" aria-live="polite"><div class="loading">Atualizando o placar...</div></div>
-          <button id="show-all" class="show-all" type="button">VER TODOS OS 29 CLUBES <span>↓</span></button>
+          <button id="show-all" class="show-all" type="button" aria-controls="leaderboard">VER TODOS OS 29 CLUBES <span aria-hidden="true">↓</span></button>
         </div>
         <p class="data-note" id="data-note"></p>
       </section>
