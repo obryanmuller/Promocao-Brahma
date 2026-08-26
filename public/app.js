@@ -10,9 +10,9 @@ const escapeHtml = value => String(value).replace(/[&<>'"]/g, char => ({ '&': '&
 
 function streakMarkup(streak) {
   if (streak === null || streak === undefined) {
-    return '<div class="streak streak-unavailable" aria-label="Dados indisponíveis"><span>?</span><span>?</span><span>?</span><span>?</span><span>?</span></div><b class="streak-count">—/5</b>';
+    return '<div class="streak streak-unavailable" aria-label="Dados indisponíveis"><span><i data-lucide="beer" aria-hidden="true"></i></span><span><i data-lucide="beer" aria-hidden="true"></i></span><span><i data-lucide="beer" aria-hidden="true"></i></span><span><i data-lucide="beer" aria-hidden="true"></i></span><span><i data-lucide="beer" aria-hidden="true"></i></span></div><b class="streak-count">—/5</b>';
   }
-  return `<div class="streak" aria-label="${streak} de 5 vitórias">${Array.from({ length: 5 }, (_, index) => `<span class="${index < streak ? 'hit' : ''}">${index < streak ? '✓' : index + 1}</span>`).join('')}</div><b class="streak-count">${streak}/5</b>`;
+  return `<div class="streak" aria-label="${streak} de 5 vitórias">${Array.from({ length: 5 }, (_, index) => `<span class="${index < streak ? 'hit' : ''}"><i data-lucide="beer" aria-hidden="true"></i></span>`).join('')}</div><b class="streak-count">${streak}/5</b>`;
 }
 
 function render() {
@@ -27,6 +27,7 @@ function render() {
       <span class="result ${team.lastResult === 'V' ? 'result-win' : ''}">${escapeHtml(team.lastResult)}</span>
       <div class="next"><strong>${escapeHtml(team.nextOpponent)}</strong><small>${escapeHtml(team.nextDate)}</small></div>
     </article>`).join('') : '<div class="empty-state">Nenhum clube encontrado. Tente outro nome.</div>';
+  window.lucide?.createIcons();
   showAll.hidden = Boolean(term);
   showAll.innerHTML = expanded ? 'MOSTRAR MENOS <span>↑</span>' : 'VER TODOS OS 29 CLUBES <span>↓</span>';
 }

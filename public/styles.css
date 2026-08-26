@@ -515,22 +515,25 @@ h1 em, h2 em {
 }
 
 .streak span {
-  width: 34px;
+  width: 30px;
   height: 34px;
-  border-radius: 50%;
   display: grid;
   place-items: center;
-  border: 1px solid #c9c3ba;
-  color: #aaa39a;
-  font-size: 11px;
-  font-weight: 800;
+  font-size: 23px;
+  line-height: 1;
+  opacity: .25;
+  filter: grayscale(1);
+}
+
+.streak span svg {
+  width: 24px;
+  height: 24px;
+  stroke-width: 2;
 }
 
 .streak span.hit {
-  background: var(--red);
-  border-color: var(--red);
-  color: #fff;
-  box-shadow: 0 3px 10px #c9092033;
+  opacity: 1;
+  filter: none;
 }
 
 .streak-count {
@@ -1179,7 +1182,5 @@ footer>strong {
 }
 
 .streak-unavailable span {
-  border-style: dashed;
-  color: #bbb;
-  background: #f4f1ec;
+  opacity: .35;
 }
