@@ -11,6 +11,26 @@ let expanded = false;
 const escapeHtml = value => String(value).replace(/[&<>'"]/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' })[char]);
 const slugify = value => String(value).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 
+async function svgToPngFile(url, filename) {
+  const response = await fetch(url);
+  if (!response.ok) throw new Error('Imagem indisponível');
+  const svgBlob = await response.blob();
+  const objectUrl = URL.createObjectURL(svgBlob);
+  try {
+    const image = new Image();
+    image.src = objectUrl;
+    await image.decode();
+    const canvas = document.createElement('canvas');
+    canvas.width = 1200;
+    canvas.height = 630;
+    canvas.getContext('2d').drawImage(image, 0, 0, canvas.width, canvas.height);
+    const pngBlob = await new Promise((resolve, reject) => canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('Conversão indisponível')), 'image/png'));
+    return new File([pngBlob], filename, { type: 'image/png' });
+  } finally {
+    URL.revokeObjectURL(objectUrl);
+  }
+}
+
 function renderTeamSpotlight() {
   const slug = document.body.dataset.teamSlug;
   const team = allTeams.find(item => slugify(item.name) === slug);
@@ -38,12 +58,10 @@ function renderTeamSpotlight() {
 
     if (navigator.share) {
       try {
-        const response = await fetch(imageUrl);
-        if (response.ok && window.File) {
-          const imageBlob = await response.blob();
-          const imageFile = new File([imageBlob], `${slug}.svg`, { type: 'image/svg+xml' });
+        if (window.File) {
+          const imageFile = await svgToPngFile(imageUrl, `${slug}.png`);
           if (navigator.canShare?.({ files: [imageFile] })) {
-            await navigator.share({ title, text, url: pageUrl, files: [imageFile] });
+            await navigator.share({ title, text: `${text} ${pageUrl}`, files: [imageFile] });
             return;
           }
         }
