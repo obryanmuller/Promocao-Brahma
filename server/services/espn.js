@@ -12,7 +12,7 @@ const ESPN_NAMES = {
   'Internacional': ['Internacional'], 'Santos': ['Santos'], 'Vasco': ['Vasco da Gama', 'Vasco'],
   'São Paulo': ['Sao Paulo'], 'Cruzeiro': ['Cruzeiro'], 'Corinthians': ['Corinthians'],
   'Atlético Mineiro': ['Atletico-MG', 'Atletico Mineiro'], 'Flamengo': ['Flamengo'],
-  'Guarani': ['Guarani'], 'Vila Nova': ['Vila Nova-GO', 'Vila Nova'], 'Coritiba': ['Coritiba'],
+  'Guarani': ['Guarani', 'Guarani FC', 'Guarani Futebol Clube', 'Guarani Campinas'], 'Vila Nova': ['Vila Nova-GO', 'Vila Nova'], 'Coritiba': ['Coritiba'],
   'Ceará': ['Ceara'], 'Ponte Preta': ['Ponte Preta'], 'Portuguesa': ['Portuguesa-SP', 'Portuguesa'],
   'Operário': ['Operario-PR', 'Operario'], 'Goiás': ['Goias'], 'Avaí FC': ['Avai'],
   'Volta Redonda': ['Volta Redonda'], 'Vitória': ['Vitoria'], 'Sport Recife': ['Sport Recife', 'Sport'],
@@ -35,11 +35,11 @@ const normalize = (value = '') => value.normalize('NFD').replace(/[\u0300-\u036f
 const toEspnDate = date => [date.getUTCFullYear(), String(date.getUTCMonth() + 1).padStart(2, '0'), String(date.getUTCDate()).padStart(2, '0')].join('');
 
 function campaignName(apiTeam, teams) {
-  const apiId = String(apiTeam?.id || '');
-  const byId = teams.find(team => ESPN_TEAM_IDS[team.name]?.has(apiId));
+  const apiIds = [apiTeam?.id, String(apiTeam?.uid || '').split(':').pop()].filter(Boolean).map(String);
+  const byId = teams.find(team => apiIds.some(apiId => ESPN_TEAM_IDS[team.name]?.has(apiId)));
   if (byId) return byId.name;
   const normalized = normalize(apiTeam?.displayName || apiTeam?.name);
-  return teams.find(team => !ESPN_TEAM_IDS[team.name] && (ESPN_NAMES[team.name] || [team.name]).some(alias => normalize(alias) === normalized))?.name || '';
+  return teams.find(team => (ESPN_NAMES[team.name] || [team.name]).some(alias => normalize(alias) === normalized))?.name || '';
 }
 
 async function requestLeague(slug, from, to) {
