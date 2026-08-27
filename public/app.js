@@ -24,6 +24,12 @@ function renderTeamSpotlight() {
   teamSpotlight.hidden = false;
   const teamLogo = team.logo ? `<img class="spotlight-logo" src="${escapeHtml(team.logo)}" alt="Escudo do ${escapeHtml(team.name)}" loading="lazy" referrerpolicy="no-referrer" />` : '';
   teamSpotlight.innerHTML = `<div class="spotlight-info"><span class="eyebrow eyebrow-dark"><span></span> CLUBE EM DESTAQUE</span><div class="spotlight-heading">${teamLogo}<h2>${escapeHtml(team.name)}</h2></div><p class="spotlight-streak">${beerIcon} <strong>${streak} vitórias consecutivas</strong></p><p class="spotlight-progress">${Array.from({ length: 5 }, (_, index) => `<span class="${index < streak ? 'active' : ''}"></span>`).join('')}</p><p>${missing ? `<strong>Faltam ${missing} vitórias para a Brahma grátis.</strong>` : '<strong>A Brahma é nossa!</strong>'}</p><small>Último resultado: ${escapeHtml(team.lastResult)} · Último adversário: ${escapeHtml(team.nextOpponent)}</small></div>${fixtureMarkup}<button id="share-team" class="button button-yellow" type="button"><span>Compartilhar clube</span><i data-lucide="share-2" aria-hidden="true"></i></button>`;
+  if (location.hash === '#corrida' && window.matchMedia('(max-width: 680px)').matches) {
+    requestAnimationFrame(() => {
+      const top = teamSpotlight.getBoundingClientRect().top + window.scrollY - 16;
+      window.scrollTo({ top, behavior: 'auto' });
+    });
+  }
   document.querySelector('#share-team').addEventListener('click', async () => {
     const title = `${team.name} — Corrida das 5 Vitórias`;
     const text = `${team.name}: ${streak} vitórias consecutivas.`;
