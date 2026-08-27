@@ -1,4 +1,5 @@
 const BASE_URL = 'https://site.api.espn.com/apis/site/v2/sports/soccer';
+import { fetchGuaraniRanking } from './fotmob-guarani.js';
 
 export const DEFAULT_LEAGUES = [
   'bra.1', 'bra.2', 'bra.3', 'bra.4', 'bra.copa_do_brazil',
@@ -50,6 +51,31 @@ async function requestLeague(slug, from, to) {
   return { slug, name: payload.leagues?.[0]?.name || slug, events: payload.events || [] };
 }
 
+async function requestGuaraniSchedule() {
+  const url = `${BASE_URL}/all/teams/3448/schedule?limit=1000`;
+  const response = await fetch(url, { headers: { Accept: 'application/json' }, signal: AbortSignal.timeout(25_000) });
+  if (!response.ok) throw new Error(`HTTP ${response.status}`);
+  const payload = await response.json();
+  return payload.events || [];
+}
+
+function parseScheduleEvent(event, teams) {
+  const competition = event.competitions?.[0];
+  const home = competition?.competitors?.find(item => item.homeAway === 'home');
+  const away = competition?.competitors?.find(item => item.homeAway === 'away');
+  if (!competition || !home || !away) return null;
+  const homeCampaign = campaignName(home.team, teams);
+  const awayCampaign = campaignName(away.team, teams);
+  if (!homeCampaign && !awayCampaign) return null;
+  const seasonName = event.season?.displayName || 'Calendário do clube';
+  const completed = competition.status?.type?.completed === true;
+  return {
+    id: event.id, date: event.date, competition: seasonName, completed,
+    home: { campaign: homeCampaign, name: home.team.displayName || home.team.name, score: Number(home.score?.value ?? home.score), logo: home.team.logo },
+    away: { campaign: awayCampaign, name: away.team.displayName || away.team.name, score: Number(away.score?.value ?? away.score), logo: away.team.logo }
+  };
+}
+
 function parseEvent(event, league, teams) {
   const competition = event.competitions?.[0];
   if (!competition?.status?.type?.completed) return null;
@@ -95,15 +121,25 @@ export async function fetchEspnRanking({ teams, leagues = DEFAULT_LEAGUES, lookb
   toDate.setUTCDate(toDate.getUTCDate() + 90);
   const to = toEspnDate(toDate);
   const settled = await Promise.allSettled(leagues.map(slug => requestLeague(slug, from, to)));
+  const guaraniSchedule = (await requestGuaraniSchedule().catch(() => []))
+    .filter(event => {
+      const timestamp = new Date(event.date).getTime();
+      return timestamp >= fromDate.getTime() && timestamp <= toDate.getTime();
+    });
+  const guaraniFotmob = await fetchGuaraniRanking({ fromDate, toDate }).catch(() => null);
   const successful = settled.filter(result => result.status === 'fulfilled').map(result => result.value);
   const failedFeeds = settled.flatMap((result, index) => result.status === 'rejected' ? [{ slug: leagues[index], error: result.reason.message }] : []);
+  const emptyFeeds = successful.filter(league => league.events.length === 0).map(league => league.slug);
   const unique = new Map();
   successful.flatMap(league => league.events.map(event => parseEvent(event, league, teams))).filter(Boolean).forEach(match => unique.set(match.id, match));
+  guaraniSchedule.map(event => parseScheduleEvent(event, teams)).filter(match => match?.completed).forEach(match => unique.set(match.id, match));
   const events = successful.flatMap(league => league.events.map(event => ({ event, league })))
     .map(({ event, league }) => parseFixture(event, league, teams)).filter(Boolean);
+  events.push(...guaraniSchedule.map(event => parseScheduleEvent(event, teams)).filter(match => match && !match.completed));
   const matches = [...unique.values()].sort((a, b) => new Date(b.date) - new Date(a.date));
 
   const ranked = teams.map(team => {
+    if (team.name === 'Guarani' && guaraniFotmob) return { ...team, ...guaraniFotmob };
     const history = matches.filter(match => match.home.campaign === team.name || match.away.campaign === team.name);
     if (history.length === 0) return { ...team, logo: ESPN_TEAM_LOGOS[team.name], streak: null, lastResult: '—', nextOpponent: 'Sem cobertura', nextDate: 'VERIFICAR', source: 'unavailable' };
     let streak = 0;
@@ -140,5 +176,5 @@ export async function fetchEspnRanking({ teams, leagues = DEFAULT_LEAGUES, lookb
   });
 
   const unavailable = ranked.filter(team => team.source === 'unavailable').map(team => team.name);
-  return { teams: ranked, coverage: { total: teams.length, resolved: teams.length - unavailable.length, unavailable, failedFeeds }, period: { from, to }, provider: 'ESPN public endpoint' };
+  return { teams: ranked, coverage: { total: teams.length, resolved: teams.length - unavailable.length, unavailable, failedFeeds, emptyFeeds }, period: { from, to }, provider: 'ESPN public endpoint' };
 }

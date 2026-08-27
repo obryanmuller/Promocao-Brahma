@@ -70,8 +70,9 @@ async function loadRanking() {
       const resolved = data.coverage?.resolved ?? data.teams.length;
       modeLabel.textContent = `DADOS PÚBLICOS · ${resolved}/${data.teams.length} CLUBES · ${date}`;
       const issues = data.coverage?.unavailable || [];
+      const emptyFeeds = data.coverage?.emptyFeeds || [];
       dataNote.textContent = issues.length
-        ? `Resultados públicos da ESPN. Sem histórico nas competições monitoradas para: ${issues.join(', ')}.`
+        ? `Resultados públicos da ESPN. Sem histórico nas competições monitoradas para: ${issues.join(', ')}.${emptyFeeds.includes('bra.3') ? ' A ESPN ainda não disponibilizou eventos atuais da Série C no feed consultado.' : ''}`
         : 'Sequências calculadas com resultados públicos da ESPN, sem chave de autenticação.';
     } else {
       modeLabel.textContent = 'MODO DEMONSTRAÇÃO · DADOS ILUSTRATIVOS';
