@@ -23,7 +23,7 @@ function renderTeamSpotlight() {
     : '<small class="fixture-empty">Agenda futura indisponível no momento.</small>';
   teamSpotlight.hidden = false;
   const teamLogo = team.logo ? `<img class="spotlight-logo" src="${escapeHtml(team.logo)}" alt="Escudo do ${escapeHtml(team.name)}" loading="lazy" referrerpolicy="no-referrer" />` : '';
-  teamSpotlight.innerHTML = `<div><span class="eyebrow eyebrow-dark"><span></span> CLUBE EM DESTAQUE</span><div class="spotlight-heading">${teamLogo}<h2>${escapeHtml(team.name)}</h2></div><p class="spotlight-streak">${beerIcon} <strong>${streak} vitórias consecutivas</strong></p><p class="spotlight-progress">${Array.from({ length: 5 }, (_, index) => `<span class="${index < streak ? 'active' : ''}"></span>`).join('')}</p><p>${missing ? `<strong>Faltam ${missing} vitórias para a Brahma grátis.</strong>` : '<strong>A Brahma é nossa!</strong>'}</p><small>Último resultado: ${escapeHtml(team.lastResult)} · Último adversário: ${escapeHtml(team.nextOpponent)}</small>${fixtureMarkup}</div><button id="share-team" class="button button-yellow" type="button"><span>Compartilhar clube</span><i data-lucide="share-2" aria-hidden="true"></i></button>`;
+  teamSpotlight.innerHTML = `<div class="spotlight-info"><span class="eyebrow eyebrow-dark"><span></span> CLUBE EM DESTAQUE</span><div class="spotlight-heading">${teamLogo}<h2>${escapeHtml(team.name)}</h2></div><p class="spotlight-streak">${beerIcon} <strong>${streak} vitórias consecutivas</strong></p><p class="spotlight-progress">${Array.from({ length: 5 }, (_, index) => `<span class="${index < streak ? 'active' : ''}"></span>`).join('')}</p><p>${missing ? `<strong>Faltam ${missing} vitórias para a Brahma grátis.</strong>` : '<strong>A Brahma é nossa!</strong>'}</p><small>Último resultado: ${escapeHtml(team.lastResult)} · Último adversário: ${escapeHtml(team.nextOpponent)}</small></div>${fixtureMarkup}<button id="share-team" class="button button-yellow" type="button"><span>Compartilhar clube</span><i data-lucide="share-2" aria-hidden="true"></i></button>`;
   document.querySelector('#share-team').addEventListener('click', async () => {
     const shareData = { title: `${team.name} — Corrida das 5 Vitórias`, text: `${team.name}: ${streak} vitórias consecutivas.`, url: window.location.href };
     if (navigator.share) await navigator.share(shareData).catch(() => {});
@@ -45,10 +45,11 @@ function render() {
   board.innerHTML = visible.length ? visible.map((team, index) => `
     <article class="team-row ${index < 3 && !term ? 'leader' : ''}">
       <span class="position">${String(allTeams.indexOf(team) + 1).padStart(2, '0')}</span>
-      <a class="team-name team-link" href="/${slugify(team.name)}" aria-label="Ver página de ${escapeHtml(team.name)}">${team.logo ? `<i class="api-crest"><img src="${escapeHtml(team.logo)}" alt="" loading="lazy" referrerpolicy="no-referrer"></i>` : `<i style="--team:${escapeHtml(team.color)}">${escapeHtml(team.short)}</i>`}<strong>${escapeHtml(team.name)}</strong></a>
+      <a class="team-name team-link" href="/${slugify(team.name)}#corrida" aria-label="Ver página de ${escapeHtml(team.name)}">${team.logo ? `<i class="api-crest"><img src="${escapeHtml(team.logo)}" alt="" loading="lazy" referrerpolicy="no-referrer"></i>` : `<i style="--team:${escapeHtml(team.color)}">${escapeHtml(team.short)}</i>`}<strong>${escapeHtml(team.name)}</strong></a>
       <div class="sequence">${streakMarkup(team.streak)}</div>
       <span class="result ${team.lastResult === 'V' ? 'result-win' : ''}">${escapeHtml(team.lastResult)}</span>
-      <div class="next"><strong>${escapeHtml(team.nextOpponent)}</strong><small>${escapeHtml(team.nextDate)}</small></div>
+      <div class="last-game"><strong>${escapeHtml(team.lastOpponent || '—')}</strong><small>${escapeHtml(team.lastDate || 'VERIFICAR')}</small></div>
+      <div class="next-game"><span class="next-game-heading">${team.nextGames?.[0] ? `<i data-lucide="${team.nextGames[0].isHome ? 'house' : 'plane'}" aria-label="${team.nextGames[0].isHome ? 'Em casa' : 'Fora de casa'}"></i>` : ''}<strong>${escapeHtml(team.nextOpponent || 'Sem próximo jogo')}</strong></span><small>${escapeHtml(team.nextDate || 'VERIFICAR')}</small></div>
     </article>`).join('') : '<div class="empty-state">Nenhum clube encontrado. Tente outro nome.</div>';
   window.lucide?.createIcons();
   showAll.hidden = Boolean(term);
@@ -72,7 +73,7 @@ async function loadRanking() {
       const issues = data.coverage?.unavailable || [];
       const emptyFeeds = data.coverage?.emptyFeeds || [];
       dataNote.textContent = issues.length
-        ? `Resultados públicos da ESPN. Sem histórico nas competições monitoradas para: ${issues.join(', ')}.${emptyFeeds.includes('bra.3') ? ' A ESPN ainda não disponibilizou eventos atuais da Série C no feed consultado.' : ''}`
+        ? `Resultados públicos da ESPN. Sem histórico nas competições monitoradas para: ${issues.join(', ')}.${emptyFeeds.includes('bra.3') ? ' ' : ''}`
         : 'Sequências calculadas com resultados públicos da ESPN, sem chave de autenticação.';
     } else {
       modeLabel.textContent = 'MODO DEMONSTRAÇÃO · DADOS ILUSTRATIVOS';

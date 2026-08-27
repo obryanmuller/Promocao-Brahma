@@ -459,7 +459,7 @@ h1 em, h2 em {
 
 .leaderboard-header, .team-row {
   display: grid;
-  grid-template-columns: 65px minmax(210px, 1.1fr) minmax(310px, 1.4fr) 90px minmax(170px, .8fr);
+  grid-template-columns: 65px minmax(210px, 1.1fr) minmax(280px, 1.3fr) 90px minmax(150px, .8fr) minmax(170px, .9fr);
   align-items: center;
 }
 
@@ -602,20 +602,35 @@ h1 em, h2 em {
   color: #177239;
 }
 
-.next {
+.last-game,
+.next-game {
   display: flex;
   flex-direction: column;
 }
 
-.next strong {
+.last-game strong,
+.next-game strong {
   font-size: 12px;
 }
 
-.next small {
+.last-game small,
+.next-game small {
   font-size: 9px;
   color: #777;
   letter-spacing: .12em;
   margin-top: 4px;
+}
+
+.next-game-heading {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.next-game-heading svg {
+  width: 15px;
+  height: 15px;
+  color: var(--red);
 }
 
 .show-all {
@@ -645,10 +660,10 @@ h1 em, h2 em {
 }
 
 .team-spotlight {
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: minmax(280px, .9fr) minmax(320px, 1.1fr) auto;
   align-items: center;
-  gap: 32px;
+  gap: 36px;
   margin: -18px 0 52px;
   padding: 30px 34px;
   background: #fff;
@@ -663,6 +678,10 @@ h1 em, h2 em {
   margin: 8px 0 14px;
   font-size: clamp(38px, 5vw, 68px);
   color: var(--red);
+}
+
+.spotlight-info {
+  min-width: 0;
 }
 
 .spotlight-heading {
@@ -715,18 +734,25 @@ h1 em, h2 em {
 }
 
 .team-spotlight .button {
-  flex-shrink: 0;
+  align-self: center;
   margin-top: 0;
 }
 
 .fixture-list {
-  margin-top: 22px;
-  border-top: 1px solid var(--line);
-  padding-top: 16px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(150px, 1fr));
+  column-gap: 24px;
+  row-gap: 8px;
+  min-width: 0;
+  margin: 0;
+  border-top: 0;
+  border-left: 1px solid var(--line);
+  padding: 4px 0 4px 28px;
 }
 
 .fixture-list > strong {
   display: block;
+  grid-column: 1 / -1;
   margin-bottom: 10px;
   color: #686159;
   font-size: 9px;
@@ -1142,11 +1168,21 @@ footer>strong {
   .leaderboard-header, .team-row {
     grid-template-columns: 50px minmax(180px, 1fr) minmax(240px, 1.2fr) 55px;
   }
-  .leaderboard-header span:last-child, .team-row .next {
+  .leaderboard-header span:nth-last-child(-n+2),
+  .team-row .last-game,
+  .team-row .next-game {
     display: none;
   }
   .prize-card {
     grid-template-columns: 1fr;
+  }
+  .team-spotlight {
+    grid-template-columns: minmax(240px, .9fr) minmax(260px, 1.1fr);
+    gap: 28px;
+  }
+  .team-spotlight .button {
+    grid-column: 1 / -1;
+    justify-self: end;
   }
   .prize-visual {
     min-height: 430px;
@@ -1263,11 +1299,20 @@ footer>strong {
   }
   .team-spotlight {
     align-items: flex-start;
-    flex-direction: column;
+    grid-template-columns: 1fr;
+    gap: 24px;
     margin: -12px 0 36px;
     padding: 24px;
   }
+  .fixture-list {
+    width: 100%;
+    grid-template-columns: 1fr;
+    border-top: 1px solid var(--line);
+    border-left: 0;
+    padding: 16px 0 0;
+  }
   .team-spotlight .button {
+    grid-column: auto;
     width: 100%;
   }
   .leaderboard-toolbar {
@@ -1289,7 +1334,7 @@ footer>strong {
   .team-row .sequence {
     grid-column: 2;
   }
-  .team-row>.result, .team-row>.next {
+  .team-row>.result, .team-row>.last-game, .team-row>.next-game {
     display: none;
   }
   .team-name i {

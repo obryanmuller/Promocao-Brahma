@@ -61,6 +61,8 @@ export async function fetchGuaraniRanking({ fromDate, toDate }) {
     logo: details.sportsTeamJSONLD?.logo || logoUrl(FOTMOB_TEAM_ID),
     streak,
     lastResult: last.score > last.opponentScore ? 'V' : last.score === last.opponentScore ? 'E' : 'D',
+    lastOpponent: last.opponent,
+    lastDate: formatDate(last.date),
     nextOpponent: nextGames[0]?.opponent || 'Sem próximo jogo',
     nextDate: nextGames[0]?.date || 'VERIFICAR',
     nextGames,

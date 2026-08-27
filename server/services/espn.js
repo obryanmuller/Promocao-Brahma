@@ -141,7 +141,7 @@ export async function fetchEspnRanking({ teams, leagues = DEFAULT_LEAGUES, lookb
   const ranked = teams.map(team => {
     if (team.name === 'Guarani' && guaraniFotmob) return { ...team, ...guaraniFotmob };
     const history = matches.filter(match => match.home.campaign === team.name || match.away.campaign === team.name);
-    if (history.length === 0) return { ...team, logo: ESPN_TEAM_LOGOS[team.name], streak: null, lastResult: '—', nextOpponent: 'Sem cobertura', nextDate: 'VERIFICAR', source: 'unavailable' };
+    if (history.length === 0) return { ...team, logo: ESPN_TEAM_LOGOS[team.name], streak: null, lastResult: '—', lastOpponent: 'Sem cobertura', lastDate: 'VERIFICAR', nextOpponent: 'Sem cobertura', nextDate: 'VERIFICAR', source: 'unavailable' };
     let streak = 0;
     let lastResult = '—';
     for (const [index, match] of history.entries()) {
@@ -168,7 +168,7 @@ export async function fetchEspnRanking({ teams, leagues = DEFAULT_LEAGUES, lookb
         const opponentTeam = teams.find(item => item.name === opponent.campaign);
         return { opponent: opponent.name, short: opponentTeam?.short || opponent.name.slice(0, 3).toUpperCase(), color: opponentTeam?.color || '#777', logo: opponent.logo, date: formatDate(match.date), isHome };
       });
-    return { ...team, logo: ESPN_TEAM_LOGOS[team.name] || own.logo, streak: Math.min(streak, 5), lastResult, nextOpponent: rival.name, nextDate: formatDate(last.date), nextGames, lastCompetition: last.competition, source: 'espn-public' };
+    return { ...team, logo: ESPN_TEAM_LOGOS[team.name] || own.logo, streak: Math.min(streak, 5), lastResult, lastOpponent: rival.name, lastDate: formatDate(last.date), nextOpponent: nextGames[0]?.opponent || 'Sem próximo jogo', nextDate: nextGames[0]?.date || 'VERIFICAR', nextGames, lastCompetition: last.competition, source: 'espn-public' };
   }).sort((a, b) => {
     if (a.streak === null) return 1;
     if (b.streak === null) return -1;
